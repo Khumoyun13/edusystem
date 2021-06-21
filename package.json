@@ -1,0 +1,23 @@
+{
+  "name": "edusystem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/server",
+    "start": "forever start src/server",
+    "restart": "forever restart src/server",
+    "stop": "forever stop src/server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Khumoyun13/edusystem.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Khumoyun13/edusystem/issues"
+  },
+  "homepage": "https://github.com/Khumoyun13/edusystem#readme"
+}
