@@ -14,7 +14,7 @@ async function postgres() {
 
     let db = {};
     db.users = await UserModel(Sequelize, sequelize);
-    await sequelize.sync({ force: true });
+    await sequelize.sync();
     return db;
   } catch (e) {
     console.error("Unable to connect to the database:", e);
