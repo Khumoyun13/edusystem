@@ -19,23 +19,23 @@ async function postgres() {
 
     await db.users.hasMany(db.attempts, {
       foreignKey: {
-        name: "user_id",
-        allowNull: false
-      }
-    })
+        name: "id",
+        allowNull: false,
+      },
+    });
 
     await db.attempts.belongsTo(db.users, {
       foreignKey: {
-        name: "user_id",
-        allowNull: false
-      }
-    })
-    
+        name: "id",
+        allowNull: false,
+      },
+    });
+
     await sequelize.sync();
     return db;
   } catch (e) {
     console.error("Unable to connect to the database:", e);
   }
-};
+}
 
 export default postgres;

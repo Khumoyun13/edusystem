@@ -1,6 +1,8 @@
 import PhoneValidation from "../validations/PhoneValidation.js";
 import SignupValidation from "../validations/SignupValidation.js";
 
+import randomNumber from "random-number";
+
 class UserController {
   static async checkPhone(req, res) {
     try {
@@ -53,8 +55,36 @@ class UserController {
 
   static async login(req, res) {
     try {
+      const data = await PhoneValidation.validateAsync(req.body);
+      const user = await req.postgres.users.findOne({
+        where: {
+          phone: data.phone,
+        },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const generatedNumber = randomNumber.generator({
+        min:  100000, 
+        max:  999999, 
+        integer: true
+      })
+
+      let attempt = await req.postgres.attempts.create({
+        code: generatedNumber(),
+        id: user.id
+      })
+
+      await res.status(201).json({
+        ok: true,
+        message: "Code sent",
+        id: attempt.dataValues.id
+      })
+
     } catch (e) {
-      res.status(400).json({
+      res.status(401).json({
         ok: false,
         message: e + "",
       });
