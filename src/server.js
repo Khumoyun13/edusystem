@@ -25,8 +25,8 @@ async function main() {
   app.use(cors());
   app.use(helmet());
   app.use(morgan("dev"));
+  app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
   app.use(async (req, res, next) => {
     req.postgres = db;
     next();

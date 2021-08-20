@@ -1,25 +1,29 @@
 export default async (Sequelize, sequelize) => {
   return await sequelize.define(
-    "attempts",
+    "sessions",
     {
-      attempt_id: {
+      session_id: {
         type: Sequelize.DataTypes.UUID,
         defaultValue: Sequelize.UUIDV4(),
         primaryKey: true,
       },
-      attempts: {
-        type: Sequelize.DataTypes.SMALLINT,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      code: {
-        type: Sequelize.DataTypes.INTEGER,
-        allowNull: false,
-      },
-      code_expire_date: {
+      session_expire_date: {
         type: Sequelize.DataTypes.DATE,
         allowNull: false,
         defaultValue: 0,
+      },
+      user_agent: {
+        type: Sequelize.DataTypes.STRING(128),
+        allowNull: false,
+      },
+      ip_address: {
+        type: Sequelize.DataTypes.INET,
+        allowNull: false,
+      },
+      session_number: {
+        type: Sequelize.DataTypes.SMALLINT,
+        allowNull: false,
+        autoIncrement: true
       },
       user_id: {
         type: Sequelize.DataTypes.UUID,
