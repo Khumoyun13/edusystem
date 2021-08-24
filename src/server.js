@@ -27,6 +27,7 @@ async function main() {
   app.use(morgan("dev"));
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
+  app.use(express.static("public"));
   app.use(async (req, res, next) => {
     req.postgres = db;
     next();

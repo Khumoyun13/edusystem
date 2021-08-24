@@ -6,6 +6,7 @@ import AttemptsModel from "../models/AttemptsModel.js";
 import BanModel from "../models/BanModel.js";
 import SessionModel from "../models/SessionModel.js";
 import SettingsModel from "../models/SettingsModel.js";
+import FileModel from "../models/FileModel.js";
 
 const sequelize = new Sequelize(config.PG_CONNECTION_STRING, {
   logging: false,
@@ -22,6 +23,7 @@ async function postgres() {
     db.bans = await BanModel(Sequelize, sequelize);
     db.sessions = await SessionModel(Sequelize, sequelize);
     db.settings = await SettingsModel(Sequelize, sequelize);
+    db.files = await FileModel(Sequelize, sequelize);
 
     await db.users.hasMany(db.attempts, {
       foreignKey: "user_id",
@@ -32,6 +34,10 @@ async function postgres() {
     });
 
     await db.users.hasMany(db.sessions, {
+      foreignKey: "user_id",
+    });
+
+    await db.users.hasMany(db.files, {
       foreignKey: "user_id",
     });
 
@@ -47,7 +53,6 @@ async function postgres() {
     // });
 
     await sequelize.sync({ force: false });
-
 
     // let x = await db.settings.create({
     //   name: "ban_time",
