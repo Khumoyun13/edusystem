@@ -496,6 +496,8 @@ class UserController {
         },
       });
 
+      if(!user) throw "Invalid validation id!"
+
       const data = await PasswordValidation.validateAsync(req.body);
 
       let salt = await bcrypt.genSalt(10);
@@ -551,7 +553,9 @@ class UserController {
       const user = await req.postgres.users.findOne({
         where: {
           id: req.user,
-        },
+        }, include : {
+          model: req.postgres.files,
+        }
       });
 
       if(!user) throw "User not found!"

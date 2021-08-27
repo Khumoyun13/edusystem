@@ -12,7 +12,7 @@ router.post("/validate-code", UserController.validateCode);
 router.post("/resend-code", UserController.sendNewCode);
 router.post("/set-password", UserController.setPassword);
 router.post("/edit", AuthMiddleware, UserController.editPersonalData);
-router.get("/", AuthMiddleware, UserController.getData);
+router.get("/get", AuthMiddleware, UserController.getData);
 
 export default {
   path: "/users",

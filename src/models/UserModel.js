@@ -41,6 +41,10 @@ export default async (Sequelize, sequelize) => {
         values: ["male", "female"],
         allowNull: false,
       },
+      profile_img_id: {
+        type: Sequelize.DataTypes.STRING(50),
+        allowNull: true
+      },
       isApproved: {
         type: Sequelize.DataTypes.BOOLEAN,
         allowNull: false,

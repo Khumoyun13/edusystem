@@ -19,6 +19,10 @@ export default async (Sequelize, sequelize) => {
         type: Sequelize.DataTypes.STRING(16),
         allowNull: false,
       },
+      path: {
+        type: Sequelize.DataTypes.STRING(128),
+        allowNull: false,
+      },
       user_id: {
         type: Sequelize.DataTypes.UUID,
         references: {
