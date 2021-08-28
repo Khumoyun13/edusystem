@@ -18,6 +18,7 @@ const { Op } = pkg;
 import moment from "moment";
 import bcrypt from "bcrypt";
 import EditProfileValidation from "../validations/EditProfileValidation.js";
+import PromotionValidation from "../validations/PromotionValidation.js";
 
 class UserController {
   // static async checkPhone(req, res) {
@@ -496,7 +497,7 @@ class UserController {
         },
       });
 
-      if(!user) throw "Invalid validation id!"
+      if (!user) throw "Invalid validation id!";
 
       const data = await PasswordValidation.validateAsync(req.body);
 
@@ -553,18 +554,18 @@ class UserController {
       const user = await req.postgres.users.findOne({
         where: {
           id: req.user,
-        }, include : {
+        },
+        include: {
           model: req.postgres.files,
-        }
+        },
       });
 
-      if(!user) throw "User not found!"
+      if (!user) throw "User not found!";
 
       res.status(200).json({
         ok: true,
         data: user.dataValues,
       });
-
     } catch (e) {
       res.status(500).json({
         ok: false,
@@ -575,9 +576,35 @@ class UserController {
 
   static async promoteUser(req, res) {
     try {
-      
+      const data = await PromotionValidation.validateAsync(req.body);
+
+      if(data.user_id === req.user) throw "You cannot promote yourself!"
+
+      if(data.role == "admin" && !req.super_admin) throw "You cannot promote to admin!"
+
+      if(data.role == "superadmin") throw "Invalid role!"
+
+      const user = await req.postgres.users.findOne({
+        where: {
+          id: data.user_id
+        }
+      });
+
+      if(user.role === "superadmin") throw "You cannot change role of Super Admin!"
+
+      await user.update({
+        role: data.role
+      });
+
+      res.status(202).json({
+        ok: true,
+        message: "Successfully edited role of a user!"
+      })
     } catch (e) {
-      
+      res.status(400).json({
+        ok: false,
+        message: e + "",
+      });
     }
   }
 }

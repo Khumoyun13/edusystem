@@ -7,6 +7,7 @@ import BanModel from "../models/BanModel.js";
 import SessionModel from "../models/SessionModel.js";
 import SettingsModel from "../models/SettingsModel.js";
 import FileModel from "../models/FileModel.js";
+import TeachersModel from "../models/TeachersModel.js";
 
 const sequelize = new Sequelize(config.PG_CONNECTION_STRING, {
   logging: false,
@@ -19,6 +20,7 @@ async function postgres() {
 
     let db = {};
     db.users = await UserModel(Sequelize, sequelize);
+    db.teachers = await TeachersModel(Sequelize, sequelize);
     db.attempts = await AttemptsModel(Sequelize, sequelize);
     db.bans = await BanModel(Sequelize, sequelize);
     db.sessions = await SessionModel(Sequelize, sequelize);
