@@ -7,7 +7,7 @@ export default async (req, res, next) => {
     });
 
     if (user.role != "admin" && user.role != "superadmin")
-      throw "You do not have permission to promote!";
+      throw "You do not have permission!";
 
     // req.admin = user.role == "admin";
     req.super_admin = user.role == "superadmin";

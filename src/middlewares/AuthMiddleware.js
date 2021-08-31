@@ -21,8 +21,8 @@ export default async (req, res, next) => {
     if (req.headers["user-agent"] != session.user_agent)
       throw "Invalid user agent!";
 
-    if (session.session_number === 3)
-      throw "The number of logged devices cannot be more than 3!";
+    // if (session.session_number === 3)
+    //   throw "The number of logged devices cannot be more than 3!";
 
     req.user = session.user_id;
 

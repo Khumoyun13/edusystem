@@ -5,7 +5,6 @@ import UserModel from "../models/UserModel.js";
 import AttemptsModel from "../models/AttemptsModel.js";
 import BanModel from "../models/BanModel.js";
 import SessionModel from "../models/SessionModel.js";
-import SettingsModel from "../models/SettingsModel.js";
 import FileModel from "../models/FileModel.js";
 import TeachersModel from "../models/TeachersModel.js";
 
@@ -24,7 +23,6 @@ async function postgres() {
     db.attempts = await AttemptsModel(Sequelize, sequelize);
     db.bans = await BanModel(Sequelize, sequelize);
     db.sessions = await SessionModel(Sequelize, sequelize);
-    db.settings = await SettingsModel(Sequelize, sequelize);
     db.files = await FileModel(Sequelize, sequelize);
 
     await db.users.hasMany(db.attempts, {

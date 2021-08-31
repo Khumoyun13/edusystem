@@ -98,7 +98,7 @@ class UserController {
 
         const new_user_attempt = await req.postgres.attempts.create({
           code: generatedNumber(),
-          code_expire_date: moment(Date.now() + Number(60000)),
+          code_expire_date: moment(Date.now() + Number(req.settings.code_time)),
           user_email: new_user.email,
           user_id: new_user.id,
         });
@@ -132,7 +132,9 @@ class UserController {
         await req.postgres.attempts.update(
           {
             code: gn(),
-            code_expire_date: moment(Date.now() + Number(60000)),
+            code_expire_date: moment(
+              Date.now() + Number(req.settings.code_time)
+            ),
           },
           {
             where: {
@@ -341,8 +343,9 @@ class UserController {
       // });
 
       await attempt.update({
+        code_attempts: 0,
         code: gn(),
-        code_expire_date: moment(Date.now() + Number(60000)),
+        code_expire_date: moment(Date.now() + Number(req.settings.code_time)),
       });
 
       // await sendMail(user.name, user.email, attempt.code);
@@ -404,6 +407,29 @@ class UserController {
 
       if (!code) throw "Invalid code";
 
+      const ban = await req.postgres.bans.findOne({
+        where: {
+          user_id: attempt.user_id,
+        },
+      });
+
+      if(ban.ban_expire_date >= moment(Date.now())) throw `You are banned until ${ban.ban_expire_date}`
+
+      if (!ban) throw "Error occurred";
+
+      if (attempt.attempts >= req.settings.attempts) {
+        await attempt.update({
+          attempts: 0,
+        });
+
+        await ban.update({
+          ban_attempts: ban.ban_attempts + 1,
+          ban_expire_date: moment(Date.now() + Number(req.settings.ban_time)),
+        });
+
+        throw `You are banned until ${moment(ban.ban_expire_date)}`;
+      }
+
       if (
         Number(code) === Number(attempt.code) &&
         attempt.code_expire_date >= moment(Date.now())
@@ -432,47 +458,27 @@ class UserController {
         (Number(code) !== Number(attempt.code) &&
           attempt.code_expire_date < moment(Date.now()))
       ) {
-        throw "Verification code expired!";
-      }
-
-      const code_attempts = await req.postgres.settings.findOne({
-        where: {
-          name: "code_attempts",
-        },
-      });
-
-      if (attempt.attempts >= Number(code_attempts) - 1) {
-        const ban = await req.postgres.bans.findOne({
-          where: {
-            user_id: attempt.user_id,
-          },
-        });
-
-        if (!ban) throw "Something went wrong";
-
-        // const ban_time = await req.postgres.settings.findOne({
-        //   where: {
-        //     name: "ban_time",
-        //   },
-        // });
-
-        await ban.update({
-          ban_attempts: ban.ban_attempts + 1,
-          ban_expire_date: moment(Date.now() + Number(7200000)),
-        });
-
-        await attempt.destroy({
-          where: {
-            attempt_id: validationId,
-          },
-        });
-
-        throw `You are banned until ${moment(ban.ban_expire_date)}`;
+        throw "Verification code expired. Resend code!";
       }
 
       if (Number(code) !== Number(attempt.code)) {
+        if (attempt.code_attempts >= Number(req.settings.code_attempts)) {
+          await attempt.update({
+            attempts: attempt.attempts + 1,
+            code_attempts: undefined,
+            code: undefined,
+            code_expire_date: undefined,
+          });
+
+          return res.status(307).json({
+            ok: false,
+            message:
+              "Get a new code at http://localhost:3300/users/resend-code !",
+          });
+        }
+
         await attempt.update({
-          attempts: attempt.attempts + 1,
+          code_attempts: attempt.code_attempts + 1,
         });
 
         throw "Invalid verification code";
@@ -578,28 +584,30 @@ class UserController {
     try {
       const data = await PromotionValidation.validateAsync(req.body);
 
-      if(data.user_id === req.user) throw "You cannot promote yourself!"
+      if (data.user_id === req.user) throw "You cannot promote yourself!";
 
-      if(data.role == "admin" && !req.super_admin) throw "You cannot promote to admin!"
+      if (data.role == "admin" && !req.super_admin)
+        throw "You cannot promote to admin!";
 
-      if(data.role == "superadmin") throw "Invalid role!"
+      if (data.role == "superadmin") throw "Invalid role!";
 
       const user = await req.postgres.users.findOne({
         where: {
-          id: data.user_id
-        }
+          id: data.user_id,
+        },
       });
 
-      if(user.role === "superadmin") throw "You cannot change role of Super Admin!"
+      if (user.role === "superadmin")
+        throw "You cannot change role of Super Admin!";
 
       await user.update({
-        role: data.role
+        role: data.role,
       });
 
       res.status(202).json({
         ok: true,
-        message: "Successfully edited role of a user!"
-      })
+        message: "Successfully edited role of a user!",
+      });
     } catch (e) {
       res.status(400).json({
         ok: false,

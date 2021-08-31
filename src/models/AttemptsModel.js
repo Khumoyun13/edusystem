@@ -12,6 +12,11 @@ export default async (Sequelize, sequelize) => {
         allowNull: false,
         defaultValue: 0,
       },
+      code_attempts: {
+        type: Sequelize.DataTypes.SMALLINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
       code: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
