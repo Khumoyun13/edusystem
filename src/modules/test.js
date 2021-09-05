@@ -13,7 +13,7 @@ import path from "path";
 
 // const files = fs.readdirSync(`./src/public/data/uploads`)
 
-// async function isExists(files) {  
+// async function isExists(files) {
 //     files.forEach((file, index) => {
 //         let x = file.split("*")[0];
 //     })

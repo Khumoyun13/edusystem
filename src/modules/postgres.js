@@ -7,6 +7,10 @@ import BanModel from "../models/BanModel.js";
 import SessionModel from "../models/SessionModel.js";
 import FileModel from "../models/FileModel.js";
 import TeachersModel from "../models/TeachersModel.js";
+import TestModel from "../models/TestModel.js";
+import CourseModel from "../models/CourseModel.js";
+import ModuleModel from "../models/ModuleModel.js";
+import LessonModel from "../models/LessonModel.js";
 
 const sequelize = new Sequelize(config.PG_CONNECTION_STRING, {
   logging: false,
@@ -24,6 +28,10 @@ async function postgres() {
     db.bans = await BanModel(Sequelize, sequelize);
     db.sessions = await SessionModel(Sequelize, sequelize);
     db.files = await FileModel(Sequelize, sequelize);
+    // db.test = await TestModel(Sequelize, sequelize);
+    db.courses = await CourseModel(Sequelize, sequelize);
+    db.modules = await ModuleModel(Sequelize, sequelize);
+    db.lessons = await LessonModel(Sequelize, sequelize);
 
     await db.users.hasMany(db.attempts, {
       foreignKey: "user_id",
@@ -53,6 +61,15 @@ async function postgres() {
     // });
 
     await sequelize.sync({ force: false });
+
+    // await db.lessons.create({
+    //   name: "1 qism",
+    //   module: "fde81ea6-e026-4fc7-b767-b0a5e610b05b",
+    // });
+
+    // let x = await db.test.create({
+    //   test: 787555
+    // });
 
     // let x = await db.settings.create({
     //   name: "ban_time",
